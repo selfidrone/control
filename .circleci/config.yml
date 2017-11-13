@@ -10,19 +10,18 @@ jobs:
       - run:
           name: Build for Arm
           command: env GOOS=linux GOARCH=arm GOARM=5 go build -o drone-control
-      - save_cache:
-          key: drone-cache
+      - persist_to_workspace:
+          root: /go/src/github.com/nicholasjackson/drone-control
           paths:
-            - /go/src/github.com/nicholasjackson/drone-control
+            - ./
  
   deploy:
     working_directory: /go/src/github.com/nicholasjackson/drone-control
     docker:
       - image: circleci/golang:1.9.1
     steps:
-      - checkout
-      - restore_cache:
-          key: drone-cache
+      - attach_workspace:
+          at: /go/src/github.com/nicholasjackson/drone-control
       - run:
           name: Fetch dependencies
           command: go get -u github.com/tcnksm/ghr
