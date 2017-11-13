@@ -9,7 +9,7 @@ jobs:
       - checkout
       - run:
           name: Build for Arm
-          command: env GOOS=linux GOARCH=arm GOARM=5 -o drone-control go build
+          command: env GOOS=linux GOARCH=arm GOARM=5 go build -o drone-control
       - save_cache:
           key: drone-cache
           paths:
