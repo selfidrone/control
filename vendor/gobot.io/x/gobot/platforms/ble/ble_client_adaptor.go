@@ -2,13 +2,14 @@ package ble
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 	"sync"
 
 	"gobot.io/x/gobot"
 
-	blelib "github.com/currantlabs/ble"
+	blelib "github.com/go-ble/ble"
 	"github.com/pkg/errors"
 )
 
@@ -67,7 +68,7 @@ func (b *ClientAdaptor) SetName(n string) { b.name = n }
 // Address returns the Bluetooth LE address for the adaptor
 func (b *ClientAdaptor) Address() string { return b.address }
 
-// Address sets if the adaptor should expect responses after
+// WithoutReponses sets if the adaptor should expect responses after
 // writing characteristics for this device
 func (b *ClientAdaptor) WithoutReponses(use bool) { b.withoutReponses = use }
 
@@ -88,8 +89,8 @@ func (b *ClientAdaptor) Connect() (err error) {
 		return errors.Wrap(err, "can't connect to peripheral "+b.Address())
 	}
 
-	b.addr = cln.Address()
-	b.address = cln.Address().String()
+	b.addr = cln.Addr()
+	b.address = cln.Addr().String()
 	b.SetName(cln.Name())
 	b.client = cln
 
@@ -99,6 +100,19 @@ func (b *ClientAdaptor) Connect() (err error) {
 	}
 
 	b.profile = p
+
+	fmt.Println("\nServices:")
+	for _, s := range b.profile.Services {
+		fmt.Printf("%#v\n", s.UUID)
+
+		for _, c := range s.Characteristics {
+			fmt.Printf("%#v\n", c)
+		}
+
+		fmt.Println("")
+	}
+	fmt.Println("\n")
+
 	b.connected = true
 	return
 }
@@ -200,6 +214,6 @@ func getBLEDevice(impl string) (d *blelib.Device, err error) {
 func filter(name string) blelib.AdvFilter {
 	return func(a blelib.Advertisement) bool {
 		return strings.ToLower(a.LocalName()) == strings.ToLower(name) ||
-			a.Address().String() == strings.ToLower(name)
+			a.Addr().String() == strings.ToLower(name)
 	}
 }

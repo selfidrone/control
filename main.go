@@ -88,8 +88,12 @@ func setupServer() {
 		case "LAND":
 			log.Println("Landing")
 			drone.Land()
+
+		case "PICTURE":
+			log.Println("Taking picture")
+			drone.TakePicture()
 		}
 	})
 
-	go http.ListenAndServe(":8080", nil)
+	go http.ListenAndServe(":8088", nil)
 }

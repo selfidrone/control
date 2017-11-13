@@ -240,6 +240,15 @@ func (b *Driver) TakePicture() (err error) {
 	return err
 }
 
+// ListPictures lists the pictures stored on the camera
+func (b *Driver) ListPictures() (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x06, 0x01, 0x00}
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
+
+	return err
+}
+
 // StartPcmd starts the continuous Pcmd communication with the Minidrone
 func (b *Driver) StartPcmd() {
 	go func() {

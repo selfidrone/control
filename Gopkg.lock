@@ -3,9 +3,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/currantlabs/ble"
+  name = "github.com/go-ble/ble"
   packages = [".","darwin","linux","linux/adv","linux/att","linux/gatt","linux/hci","linux/hci/cmd","linux/hci/evt","linux/hci/socket"]
-  revision = "ba3b00e87511deec53b2d0e8df691426a1d37bf7"
+  revision = "788214691384e85e345bff9fd5eeb046f5983594"
 
 [[projects]]
   branch = "master"
@@ -53,25 +53,19 @@
   branch = "master"
   name = "github.com/raff/goble"
   packages = ["xpc"]
-  revision = "b12b34f940c4cf4363660073539b5fa9fd96bd16"
+  revision = "591010bb87c136ee390f8f20529039fea824f737"
 
 [[projects]]
   name = "gobot.io/x/gobot"
   packages = [".","platforms/ble","platforms/parrot/minidrone"]
-  revision = "0c9d2d7e2151f6354df165453e8aaf11cf0456d2"
-  version = "v1.7.0"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/net"
-  packages = ["context"]
-  revision = "ea0da6f35caf3ff91581c800469e22eef75076f4"
+  revision = "9f153dbce4d06717185a5c864a350c216a94ae76"
+  version = "v1.7.1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "95c6576299259db960f6c5b9b69ea52422860fce"
+  revision = "1e2299c37cc91a509f1b12369872d27be0ce98a6"
 
 [solve-meta]
   analyzer-name = "dep"
