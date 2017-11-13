@@ -47,9 +47,6 @@ func main() {
 		drone.On(minidrone.Landed, func(data interface{}) {
 			fmt.Println("landed.")
 		})
-
-		//	time.Sleep(1000 * time.Millisecond)
-		//	drone.TakeOff()
 	}
 
 	robot := gobot.NewRobot("minidrone",
