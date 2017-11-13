@@ -1,5 +1,6 @@
 version: 2
 jobs:
+
   build:
     working_directory: /go/src/github.com/nicholasjackson/drone-control
     docker:
@@ -7,14 +8,36 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Build for Arm
+          command: env GOOS=linux GOARCH=arm GOARM=5 -o drone-control go build
+      - save_cache:
+          key: drone-cache
+          paths:
+            - /go/src/github.com/nicholasjackson/drone-control
+ 
+  deploy:
+    working_directory: /go/src/github.com/nicholasjackson/drone-control
+    docker:
+      - image: circleci/golang:1.9.1
+    steps:
+      - restore_cache:
+          key: drone-cache
+      - run:
           name: Fetch dependencies
           command: go get -u github.com/tcnksm/ghr
       - run:
-          name: Build for Arm
-          command: env GOOS=linux GOARCH=arm GOARM=5 -o drone-control go build
-      - run:
           name: Deploy to github releases
-          command: |
-					  if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
-	            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` ./drone-control
-					  fi
+          command: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` ./drone-control
+
+workflows:
+  version: 2
+
+  build_test_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
