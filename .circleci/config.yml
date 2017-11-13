@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/nicholasjackson/drone-control
+    docker:
+      - image: circleci/golang:1.9.1
+    steps:
+      - checkout
+      - run:
+          name: Fetch dependencies
+          command: go get -u github.com/tcnksm/ghr
+      - run:
+          name: Build for Arm
+          command: env GOOS=linux GOARCH=arm GOARM=5 -o drone-control go build
+      - run:
+          name: Deploy to github releases
+          command: |
+						if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
+	            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` ./drone-control
+						fi
