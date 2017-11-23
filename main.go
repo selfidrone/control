@@ -1,51 +1,61 @@
 package main
 
 import (
-	"encoding/json"
+	"bytes"
+	"compress/gzip"
+	"encoding/gob"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
+	"time"
 
+	"github.com/nats-io/nats"
+	"github.com/nicholasjackson/drone-control/control"
+	messages "github.com/nicholasjackson/drone-messages"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/ble"
 	"gobot.io/x/gobot/platforms/parrot/minidrone"
 )
 
 var drone *minidrone.Driver
+var nc *nats.Conn
 
 func main() {
+	log.Println("Starting drone control")
+
+	setupNATS()
+
+	// create a new camera and update every second
+	cam := control.NewCamera(1 * time.Second)
+	go cam.Start()
+
+	for i := range cam.Images() {
+		var zb bytes.Buffer
+		zw, _ := gzip.NewWriterLevel(&zb, gzip.BestCompression)
+		zw.Write(i)
+		zw.Close()
+
+		m := messages.DroneImage{Data: zb.Bytes()}
+
+		var b bytes.Buffer
+		gob.NewEncoder(&b).Encode(m)
+
+		nc.Publish(messages.MessageDroneImage, b.Bytes())
+		log.Println("Got image")
+	}
+}
+
+func startDrone() {
+
 	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
 	drone = minidrone.NewDriver(bleAdaptor)
 
+	ap := control.NewAutoPilot(drone)
+
 	work := func() {
-		drone.On(minidrone.Battery, func(data interface{}) {
-			fmt.Printf("battery: %d\n", data)
-		})
-
-		drone.On(minidrone.FlightStatus, func(data interface{}) {
-			fmt.Printf("flight status: %d\n", data)
-		})
-
-		drone.On(minidrone.Takeoff, func(data interface{}) {
-			fmt.Println("taking off...")
-		})
-
-		drone.On(minidrone.Hovering, func(data interface{}) {
-			fmt.Println("hovering!")
-			/*
-				gobot.After(5*time.Second, func() {
-					drone.Land()
-				})
-			*/
-		})
-
-		drone.On(minidrone.Landing, func(data interface{}) {
-			fmt.Println("landing...")
-		})
-
-		drone.On(minidrone.Landed, func(data interface{}) {
-			fmt.Println("landed.")
+		ap.Setup()
+		nc.Subscribe("done.control", func(m *nats.Msg) {
+			ap.HandleMessage(string(m.Data))
 		})
 	}
 
@@ -55,42 +65,18 @@ func main() {
 		work,
 	)
 
-	setupServer()
-
 	robot.Start()
 }
 
-// Message is the json message passed to the server
-type Message struct {
-	Command string
-	Value   string
+func setupNATS() {
+	var err error
+	nc, err = nats.Connect("nats://192.168.1.113:4222")
+	if err != nil {
+		log.Fatal("Unable to connect to nats server")
+	}
 }
 
-func setupServer() {
-	log.Println("Starting Control Server")
-
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		var message Message
-		err := json.NewDecoder(r.Body).Decode(&message)
-
-		if err != nil {
-			log.Println(err)
-		}
-
-		switch message.Command {
-		case "LAUNCH":
-			log.Println("Launching")
-			drone.TakeOff()
-
-		case "LAND":
-			log.Println("Landing")
-			drone.Land()
-
-		case "PICTURE":
-			log.Println("Taking picture")
-			drone.TakePicture()
-		}
-	})
-
-	go http.ListenAndServe(":8088", nil)
+func writeLog(message string, args ...interface{}) {
+	log.Println(message, args)
+	nc.Publish("log", []byte(fmt.Sprintf(message, args)))
 }

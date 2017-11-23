@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/golang/freetype"
+  packages = [".","raster","truetype"]
+  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
+
+[[projects]]
+  branch = "master"
   name = "github.com/hashicorp/errwrap"
   packages = ["."]
   revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
@@ -18,6 +24,12 @@
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
   revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/matryer/is"
+  packages = ["."]
+  revision = "c0323ceb4e996e4a8795670d1fb6f60e65b82fd2"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -44,6 +56,30 @@
   version = "v1"
 
 [[projects]]
+  name = "github.com/nats-io/go-nats"
+  packages = ["encoders/builtin","util"]
+  revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
+  version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/nats-io/nats"
+  packages = ["."]
+  revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
+  version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/nats-io/nuid"
+  packages = ["."]
+  revision = "289cccf02c178dc782430d534e3c1f5b72af807f"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/nicholasjackson/drone-messages"
+  packages = ["."]
+  revision = "2f278107ff217a7ac6f6c0112fe2216d97d3efbe"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -56,6 +92,12 @@
   revision = "591010bb87c136ee390f8f20529039fea824f737"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/technomancers/piCamera"
+  packages = ["."]
+  revision = "e88c363ca727faa8f777085128d0631305081698"
+
+[[projects]]
   name = "gobot.io/x/gobot"
   packages = [".","platforms/ble","platforms/parrot/minidrone"]
   revision = "9f153dbce4d06717185a5c864a350c216a94ae76"
@@ -63,13 +105,19 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/image"
+  packages = ["font","font/gofont/goregular","math/fixed"]
+  revision = "f7e31b4ea2e3413ab91b4e7d2dc83e5f8d19a44c"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "1e2299c37cc91a509f1b12369872d27be0ce98a6"
+  revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "aefd914346f12c17e5a08200d7c0cc5d2f2c000bc656debdf799d48a22a24adb"
+  inputs-digest = "72fc63541234fe154260a2ef33060c36c4950ed915f9ee3743977994a70c2964"
   solver-name = "gps-cdcl"
   solver-version = 1

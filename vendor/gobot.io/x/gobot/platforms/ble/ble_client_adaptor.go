@@ -2,7 +2,6 @@ package ble
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -100,19 +99,6 @@ func (b *ClientAdaptor) Connect() (err error) {
 	}
 
 	b.profile = p
-
-	fmt.Println("\nServices:")
-	for _, s := range b.profile.Services {
-		fmt.Printf("%#v\n", s.UUID)
-
-		for _, c := range s.Characteristics {
-			fmt.Printf("%#v\n", c)
-		}
-
-		fmt.Println("")
-	}
-	fmt.Println("\n")
-
 	b.connected = true
 	return
 }
