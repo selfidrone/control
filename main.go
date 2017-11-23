@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"compress/gzip"
-	"encoding/gob"
 	"fmt"
 	"log"
 	"os"
@@ -30,23 +27,15 @@ func main() {
 	go cam.Start()
 
 	for i := range cam.Images() {
-		var zb bytes.Buffer
-		zw, _ := gzip.NewWriterLevel(&zb, gzip.BestCompression)
-		zw.Write(i)
-		zw.Close()
+		di := messages.DroneImage{}
+		di.SetZippedData(i)
 
-		m := messages.DroneImage{Data: zb.Bytes()}
-
-		var b bytes.Buffer
-		gob.NewEncoder(&b).Encode(m)
-
-		nc.Publish(messages.MessageDroneImage, b.Bytes())
+		nc.Publish(messages.MessageDroneImage, di.EncodeMessage())
 		log.Println("Got image")
 	}
 }
 
 func startDrone() {
-
 	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
 	drone = minidrone.NewDriver(bleAdaptor)
 
@@ -54,8 +43,11 @@ func startDrone() {
 
 	work := func() {
 		ap.Setup()
-		nc.Subscribe("done.control", func(m *nats.Msg) {
-			ap.HandleMessage(string(m.Data))
+		nc.Subscribe(messages.MessageFlight, func(m *nats.Msg) {
+			fm := messages.Flight{}
+			fm.DecodeMessage(m.Data)
+
+			ap.HandleMessage(&fm)
 		})
 	}
 

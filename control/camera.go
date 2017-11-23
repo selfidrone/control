@@ -67,11 +67,11 @@ func (c *Camera) Stop() {
 }
 
 func (c *Camera) writeImage(buffer []byte) {
-	if _, err := os.Stat("./latest.jpg"); !os.IsNotExist(err) {
-		os.Remove("./latest.jpg")
+	if _, err := os.Stat("/tmp/latest.jpg"); !os.IsNotExist(err) {
+		os.Remove("/tmp/latest.jpg")
 	}
 
-	f, err := os.Create("./latest.jpg")
+	f, err := os.Create("/tmp/latest.jpg")
 	if err != nil {
 		log.Println("Unable to create file", f)
 		return
@@ -80,5 +80,5 @@ func (c *Camera) writeImage(buffer []byte) {
 
 	f.Write(buffer)
 
-	log.Println("Written image to ./latest.jpg")
+	log.Println("Written image to /tmp/latest.jpg")
 }

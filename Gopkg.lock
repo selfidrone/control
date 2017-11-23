@@ -77,7 +77,7 @@
   branch = "master"
   name = "github.com/nicholasjackson/drone-messages"
   packages = ["."]
-  revision = "2f278107ff217a7ac6f6c0112fe2216d97d3efbe"
+  revision = "99269504ab144c87702af6ddcc6aac130a8ff52e"
 
 [[projects]]
   name = "github.com/pkg/errors"
