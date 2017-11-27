@@ -17,6 +17,7 @@ var (
 	lockMamboDroneMockLeft             sync.RWMutex
 	lockMamboDroneMockOn               sync.RWMutex
 	lockMamboDroneMockRight            sync.RWMutex
+	lockMamboDroneMockStop             sync.RWMutex
 	lockMamboDroneMockTakeOff          sync.RWMutex
 	lockMamboDroneMockUp               sync.RWMutex
 )
@@ -53,6 +54,9 @@ var (
 //             },
 //             RightFunc: func(val int) error {
 // 	               panic("TODO: mock out the Right method")
+//             },
+//             StopFunc: func() error {
+// 	               panic("TODO: mock out the Stop method")
 //             },
 //             TakeOffFunc: func() error {
 // 	               panic("TODO: mock out the TakeOff method")
@@ -93,6 +97,9 @@ type MamboDroneMock struct {
 
 	// RightFunc mocks the Right method.
 	RightFunc func(val int) error
+
+	// StopFunc mocks the Stop method.
+	StopFunc func() error
 
 	// TakeOffFunc mocks the TakeOff method.
 	TakeOffFunc func() error
@@ -146,6 +153,9 @@ type MamboDroneMock struct {
 		Right []struct {
 			// Val is the val argument value.
 			Val int
+		}
+		// Stop holds details about calls to the Stop method.
+		Stop []struct {
 		}
 		// TakeOff holds details about calls to the TakeOff method.
 		TakeOff []struct {
@@ -433,6 +443,32 @@ func (mock *MamboDroneMock) RightCalls() []struct {
 	lockMamboDroneMockRight.RLock()
 	calls = mock.calls.Right
 	lockMamboDroneMockRight.RUnlock()
+	return calls
+}
+
+// Stop calls StopFunc.
+func (mock *MamboDroneMock) Stop() error {
+	if mock.StopFunc == nil {
+		panic("moq: MamboDroneMock.StopFunc is nil but MamboDrone.Stop was just called")
+	}
+	callInfo := struct {
+	}{}
+	lockMamboDroneMockStop.Lock()
+	mock.calls.Stop = append(mock.calls.Stop, callInfo)
+	lockMamboDroneMockStop.Unlock()
+	return mock.StopFunc()
+}
+
+// StopCalls gets all the calls that were made to Stop.
+// Check the length with:
+//     len(mockedMamboDrone.StopCalls())
+func (mock *MamboDroneMock) StopCalls() []struct {
+} {
+	var calls []struct {
+	}
+	lockMamboDroneMockStop.RLock()
+	calls = mock.calls.Stop
+	lockMamboDroneMockStop.RUnlock()
 	return calls
 }
 

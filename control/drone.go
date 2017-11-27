@@ -15,4 +15,5 @@ type MamboDrone interface {
 	Left(val int) error
 	Clockwise(val int) error
 	CounterClockwise(val int) error
+	Stop() error
 }

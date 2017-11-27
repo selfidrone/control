@@ -8,22 +8,45 @@ import (
 	"github.com/technomancers/piCamera"
 )
 
-// Camera defines the raspberry pi camera
-type Camera struct {
+//go:generate moq -out camera_mocks_test.go . Camera
+
+// Camera defines a new control interface
+type Camera interface {
+	Start()
+	Stop()
+	Images() chan []byte
+}
+
+// CameraImpl defines the raspberry pi camera
+type CameraImpl struct {
 	cam       *piCamera.PiCamera
 	imageChan chan []byte
 	update    time.Duration
+	running   bool
 }
 
 // NewCamera creates a new camera with the given update duration
-func NewCamera(update time.Duration) *Camera {
-	c := &Camera{update: update}
+func NewCamera(update time.Duration, height, width int, imageSize int, exposure string) *CameraImpl {
+	c := &CameraImpl{update: update}
 	c.imageChan = make(chan []byte)
 
 	args := piCamera.NewArgs()
-	args.Mode = 0
-	args.Rotation = 180
-	args.ExposureMode = piCamera.ExpBacklight
+	args.Mode = imageSize
+	//	args.Rotation = 180
+	args.Height = height
+	args.Width = width
+
+	switch exposure {
+	case "auto":
+		args.ExposureMode = piCamera.ExpAuto
+	case "night":
+		args.ExposureMode = piCamera.ExpNight
+	case "backlight":
+		args.ExposureMode = piCamera.ExpBacklight
+		args.Metering = piCamera.MeterBacklit
+	case "spotlight":
+		args.ExposureMode = piCamera.ExpSpotlight
+	}
 
 	var err error
 	c.cam, err = piCamera.New(nil, args)
@@ -35,19 +58,22 @@ func NewCamera(update time.Duration) *Camera {
 }
 
 // Start starts the camera
-func (c *Camera) Start() {
+func (c *CameraImpl) Start() {
+	log.Println("Starting Camera")
+	c.running = true
+
 	err := c.cam.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for {
+	for c.running == true {
 		buffer, err := c.cam.GetFrame()
 
 		if err != nil {
 			log.Println("Get Frame", err)
 		} else {
-			c.writeImage(buffer)
+			//c.writeImage(buffer)
 			c.imageChan <- buffer
 		}
 
@@ -56,17 +82,19 @@ func (c *Camera) Start() {
 }
 
 // Images returns a channel containing jpg images
-func (c *Camera) Images() chan []byte {
+func (c *CameraImpl) Images() chan []byte {
 	return c.imageChan
 }
 
 // Stop stops capturing images
-func (c *Camera) Stop() {
+func (c *CameraImpl) Stop() {
+	log.Println("Stopping Camera")
+
+	c.running = false
 	c.cam.Stop()
-	close(c.imageChan)
 }
 
-func (c *Camera) writeImage(buffer []byte) {
+func (c *CameraImpl) writeImage(buffer []byte) {
 	if _, err := os.Stat("/tmp/latest.jpg"); !os.IsNotExist(err) {
 		os.Remove("/tmp/latest.jpg")
 	}

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/gob"
+	"image"
 	"io"
 	"io/ioutil"
 	"os"
@@ -19,10 +20,36 @@ const (
 )
 
 const (
-	// CommandTakeOff instructs a drone taking off
-	CommandTakeOff = "takeoff"
+	// CommandBackward instructs a drone to move backward
+	CommandBackward = "backward"
+	//CommandClockwise instructs a drone to move clockwise
+	CommandClockwise = "clockwise"
+	// CommandCounterClockwise instructs a drone to move counter clockwise
+	CommandCounterClockwise = "counterclockwise"
+	// CommandDown instructs a drone to move down
+	CommandDown = "down"
+	// CommandForward instructs a drone to move forward
+	CommandForward = "forward"
 	// CommandLand instructs a drone to land
 	CommandLand = "land"
+	// CommandLeft instructs a drone to move left
+	CommandLeft = "left"
+	// CommandRight instructs a drone to move right
+	CommandRight = "right"
+	// CommandTakeOff instructs a drone taking off
+	CommandTakeOff = "takeoff"
+	// CommandUp instructs a drone to move up
+	CommandUp = "up"
+	// CommandStop instructs the drone to stop
+	CommandStop = "stop"
+
+	// CommandFollowFace instructs the drone to follow the location of a detected face
+	CommandFollowFace = "followface"
+
+	//CommandConnect instructs the application to connect to a drone
+	CommandConnect = "connect"
+	//CommandDisconnect instructs the application to connect to a drone
+	CommandDisconnect = "disconnect"
 )
 
 // DroneImage defines a new image taken from a drone
@@ -38,16 +65,8 @@ type Flight struct {
 
 // FaceDetected defines a face detection message
 type FaceDetected struct {
-	Faces  []Rectangle
-	Bounds Rectangle
-}
-
-// Rectangle defines a rectangular shape
-type Rectangle struct {
-	X      int
-	Y      int
-	Height int
-	Width  int
+	Faces  []image.Rectangle
+	Bounds image.Rectangle
 }
 
 // EncodeMessage gob encodes the message and returns a byte slice

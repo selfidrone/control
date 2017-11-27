@@ -1,32 +1,45 @@
 package control
 
 import (
+	"image"
 	"testing"
+	"time"
 
 	"github.com/matryer/is"
 	messages "github.com/nicholasjackson/drone-messages"
 )
 
-var bounds = messages.Rectangle{X: 0, Y: 0, Width: 1000, Height: 800}
+var speed = 10
 
 var initialMessage = messages.FaceDetected{
-	Faces: []messages.Rectangle{
-		{
-			X:      300,
-			Y:      700,
-			Width:  200,
-			Height: 200,
-		},
+	Faces: []image.Rectangle{
+		image.Rect(200, 250, 300, 350),
 	},
 	Bounds: bounds,
 }
 
-func TestFollowFaceDoesNothingOnFirstCall(t *testing.T) {
-	ap, md := setupAutopilot(t)
-	is := is.New(t)
+var bounds = image.Rect(0, 0, 800, 600)
 
-	ap.HandleMessage(messages.FaceDetected{})
+var faces = [][]image.Rectangle{
+	[]image.Rectangle{
+		image.Rect(200, 250, 300, 350),
+	},
+	[]image.Rectangle{
+		image.Rect(250, 250, 350, 350),
+	},
+	[]image.Rectangle{
+		image.Rect(300, 250, 400, 350),
+	},
+	[]image.Rectangle{
+		image.Rect(350, 250, 450, 350),
+	},
+	[]image.Rectangle{
+		image.Rect(350, 250, 450, 350),
+	},
+	//		image.Rect(0, 0, 500, 400),
+}
 
+func testNoMovement(is *is.I, md *MamboDroneMock) {
 	is.Equal(0, len(md.BackwardCalls()))         // expected no backward calls
 	is.Equal(0, len(md.ClockwiseCalls()))        // expected no clockwise calls
 	is.Equal(0, len(md.CounterClockwiseCalls())) // expected no counter clockwise calls
@@ -39,23 +52,151 @@ func TestFollowFaceDoesNothingOnFirstCall(t *testing.T) {
 	is.Equal(0, len(md.UpCalls()))               // expected no up calls
 }
 
-func TestMovesDroneToCorrectPosition(t *testing.T) {
-	ap, md := setupAutopilot(t)
+func TestStopFollowingStopsDrone(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
 	is := is.New(t)
 
-	ap.HandleMessage(initialMessage)
-	ap.HandleMessage(messages.FaceDetected{
-		Faces: []messages.Rectangle{
-			{
-				X:      500,
-				Y:      700,
-				Width:  200,
-				Height: 200,
-			},
+	ap.StopFollowing()
+
+	is.Equal(1, len(md.StopCalls())) // expeced stop to be called
+}
+
+func TestFollowFaceDoesNothingOnFirstCall(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&messages.FaceDetected{})
+
+	testNoMovement(is, md)
+}
+
+func TestOnlyMovesWhenFollowingEnabled(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.StopFollowing()
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces: []image.Rectangle{
+			image.Rect(0, 0, 400, 300),
 		},
 		Bounds: bounds,
 	})
 
-	lc := md.LeftCalls()[0]
-	is.Equal(1, lc.Val) // expected drone to move left by 10
+	testNoMovement(is, md)
 }
+
+func TestMovesDroneLeft(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  faces[0],
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.LeftCalls()))       // expected 1 call to move left
+	is.Equal(speed, md.LeftCalls()[0].Val) // expected drone to move left at speed
+}
+
+func TestDoesNotMovesDroneLeftWhenMinDistance(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  faces[4],
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.StopCalls())) // expected 1 call to stop
+}
+
+/*
+func TestMovesDroneRight(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(initialMessage)
+	ap.HandleMessage(messages.FaceDetected{
+		Faces: []image.Rectangle{
+			image.Rect(0, 0, 200, 300),
+		},
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.RightCalls()))       // expected 1 call to move right
+	is.Equal(speed, md.RightCalls()[0].Val) // expected drone to move right at speed
+}
+
+func TestDoesNotMovesDroneRightWhenMinDistance(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(initialMessage)
+	ap.HandleMessage(messages.FaceDetected{
+		Faces: []image.Rectangle{
+			image.Rect(0, 0, 299, 300),
+		},
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.RightCalls()))   // expected 1 call to move right
+	is.Equal(0, md.RightCalls()[0].Val) // expected to set speed to 0
+}
+*/
+
+func TestStopsDroneAfterNSecondsAndNoFaceData(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  faces[0],
+		Bounds: bounds,
+	})
+
+	time.Sleep(2500 * time.Millisecond)
+
+	is.Equal(1, len(md.LeftCalls()))       // expected 1 call to move right
+	is.Equal(speed, md.LeftCalls()[0].Val) // expected drone to move right at speed
+	is.Equal(1, len(md.StopCalls()))       // expected 1 call to stop
+}
+
+/*
+func TestDMSResetsAfterDelayAndNewFaceData(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(initialMessage)
+	ap.HandleMessage(messages.FaceDetected{
+		Faces: []image.Rectangle{
+			image.Rect(0, 0, 200, 300),
+		},
+		Bounds: bounds,
+	})
+
+	time.Sleep(1500 * time.Millisecond)
+
+	ap.HandleMessage(messages.FaceDetected{
+		Faces: []image.Rectangle{
+			image.Rect(0, 0, 100, 300),
+		},
+		Bounds: bounds,
+	})
+
+	time.Sleep(1500 * time.Millisecond)
+
+	ap.HandleMessage(messages.FaceDetected{
+		Faces: []image.Rectangle{
+			image.Rect(0, 0, 50, 300),
+		},
+		Bounds: bounds,
+	})
+
+	is.Equal(3, len(md.RightCalls()))       // expected 3 call to move right
+	is.Equal(speed, md.RightCalls()[0].Val) // expected drone to move right at speed
+	is.Equal(0, len(md.StopCalls()))        // expected 0 call to stop
+}
+*/
