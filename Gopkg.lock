@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/go-ble/ble"
   packages = [".","darwin","linux","linux/adv","linux/att","linux/gatt","linux/hci","linux/hci/cmd","linux/hci/evt","linux/hci/socket"]
-  revision = "788214691384e85e345bff9fd5eeb046f5983594"
+  revision = "c88cfeb1882ae50943d93d5e1f810dfc3df7b5f1"
 
 [[projects]]
   branch = "master"
@@ -113,7 +113,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "a13efeb2fd213cf4be7227992aa54519af3b2ac0"
+  revision = "a204229cd828a74741ee7b5da9bf4794497f85ed"
 
 [solve-meta]
   analyzer-name = "dep"

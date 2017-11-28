@@ -17,8 +17,6 @@ type AutoPilot struct {
 	speed          int
 	timeout        time.Duration
 	deadMansSwitch *time.Timer
-	movingRight    bool
-	movingLeft     bool
 }
 
 // NewAutoPilot creates a new autopilot structure
@@ -27,8 +25,8 @@ func NewAutoPilot(d MamboDrone) *AutoPilot {
 		drone:       d,
 		following:   false,
 		minDistance: 50,
-		speed:       10,
-		timeout:     2 * time.Second,
+		speed:       30,
+		timeout:     1 * time.Second,
 	}
 }
 
@@ -37,11 +35,11 @@ func (a *AutoPilot) Setup() error {
 	log.Println("Started AutoPilot")
 
 	a.drone.On(minidrone.Battery, func(data interface{}) {
-		writeLog("battery: %d\n", data)
+		//writeLog("battery: %d\n", data)
 	})
 
 	a.drone.On(minidrone.FlightStatus, func(data interface{}) {
-		writeLog("flight status: %d\n", data)
+		writeLog("flight status: %#v\n", data)
 	})
 
 	a.drone.On(minidrone.Takeoff, func(data interface{}) {
@@ -91,6 +89,12 @@ func (a *AutoPilot) HandleMessage(m interface{}) error {
 		case messages.CommandCounterClockwise:
 			return a.drone.CounterClockwise(fm.Value)
 		case messages.CommandStop:
+			a.drone.Left(0)
+			a.drone.Right(0)
+			a.drone.Forward(0)
+			a.drone.Backward(0)
+			a.drone.Up(0)
+			a.drone.Down(0)
 			return a.drone.Stop()
 		case messages.CommandFollowFace:
 			if fm.Value == 1 {
@@ -106,6 +110,6 @@ func (a *AutoPilot) HandleMessage(m interface{}) error {
 	return nil
 }
 
-func writeLog(m string, data ...interface{}) {
-	//log.Println(m, data)
+func writeLog(format string, data ...interface{}) {
+	//log.Printf(format, data)
 }

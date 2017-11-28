@@ -29,17 +29,19 @@ var m = [][]image.Rectangle{
 	[]image.Rectangle{
 		image.Rect(250, 250, 300, 300), // Move Left CP: 275
 	},
+	/*
+		[]image.Rectangle{
+			image.Rect(350, 250, 400, 300), // Stop CP: 375
+		},
+		[]image.Rectangle{
+			image.Rect(350, 250, 400, 300), // Stop CP: 375
+		},
+	*/
 	[]image.Rectangle{
-		image.Rect(350, 250, 400, 300), // Stop CP: 375
-	},
-	[]image.Rectangle{
-		image.Rect(350, 250, 400, 300), // Stop CP: 375
+		image.Rect(450, 250, 500, 300), // Right CP: 475
 	},
 	[]image.Rectangle{
 		image.Rect(500, 250, 550, 300), // Right CP: 525
-	},
-	[]image.Rectangle{
-		image.Rect(450, 250, 500, 300), // Right CP: 475
 	},
 	[]image.Rectangle{
 		image.Rect(400, 250, 450, 300), // Stop CP: 425
@@ -68,6 +70,6 @@ func main() {
 		}
 
 		nc.Publish(messages.MessageFaceDetection, fdm.EncodeMessage())
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 	}
 }

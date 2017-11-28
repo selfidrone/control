@@ -9,7 +9,7 @@ import (
 	messages "github.com/nicholasjackson/drone-messages"
 )
 
-var speed = 10
+var speed = 30
 
 var initialMessage = messages.FaceDetected{
 	Faces: []image.Rectangle{

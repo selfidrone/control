@@ -74,6 +74,7 @@ func startDrone(name string) {
 
 	work := func() {
 		autoPilot.Setup()
+		fmt.Println("Ready...")
 	}
 
 	robot = gobot.NewRobot("minidrone",

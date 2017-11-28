@@ -7,6 +7,7 @@ type MamboDrone interface {
 	On(name string, f func(s interface{})) error
 	Land() error
 	TakeOff() error
+	FlatTrim() error
 	Up(val int) error
 	Down(val int) error
 	Forward(val int) error

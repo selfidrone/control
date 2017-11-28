@@ -12,6 +12,7 @@ var (
 	lockMamboDroneMockClockwise        sync.RWMutex
 	lockMamboDroneMockCounterClockwise sync.RWMutex
 	lockMamboDroneMockDown             sync.RWMutex
+	lockMamboDroneMockFlatTrim         sync.RWMutex
 	lockMamboDroneMockForward          sync.RWMutex
 	lockMamboDroneMockLand             sync.RWMutex
 	lockMamboDroneMockLeft             sync.RWMutex
@@ -39,6 +40,9 @@ var (
 //             },
 //             DownFunc: func(val int) error {
 // 	               panic("TODO: mock out the Down method")
+//             },
+//             FlatTrimFunc: func() error {
+// 	               panic("TODO: mock out the FlatTrim method")
 //             },
 //             ForwardFunc: func(val int) error {
 // 	               panic("TODO: mock out the Forward method")
@@ -82,6 +86,9 @@ type MamboDroneMock struct {
 
 	// DownFunc mocks the Down method.
 	DownFunc func(val int) error
+
+	// FlatTrimFunc mocks the FlatTrim method.
+	FlatTrimFunc func() error
 
 	// ForwardFunc mocks the Forward method.
 	ForwardFunc func(val int) error
@@ -128,6 +135,9 @@ type MamboDroneMock struct {
 		Down []struct {
 			// Val is the val argument value.
 			Val int
+		}
+		// FlatTrim holds details about calls to the FlatTrim method.
+		FlatTrim []struct {
 		}
 		// Forward holds details about calls to the Forward method.
 		Forward []struct {
@@ -289,6 +299,32 @@ func (mock *MamboDroneMock) DownCalls() []struct {
 	lockMamboDroneMockDown.RLock()
 	calls = mock.calls.Down
 	lockMamboDroneMockDown.RUnlock()
+	return calls
+}
+
+// FlatTrim calls FlatTrimFunc.
+func (mock *MamboDroneMock) FlatTrim() error {
+	if mock.FlatTrimFunc == nil {
+		panic("moq: MamboDroneMock.FlatTrimFunc is nil but MamboDrone.FlatTrim was just called")
+	}
+	callInfo := struct {
+	}{}
+	lockMamboDroneMockFlatTrim.Lock()
+	mock.calls.FlatTrim = append(mock.calls.FlatTrim, callInfo)
+	lockMamboDroneMockFlatTrim.Unlock()
+	return mock.FlatTrimFunc()
+}
+
+// FlatTrimCalls gets all the calls that were made to FlatTrim.
+// Check the length with:
+//     len(mockedMamboDrone.FlatTrimCalls())
+func (mock *MamboDroneMock) FlatTrimCalls() []struct {
+} {
+	var calls []struct {
+	}
+	lockMamboDroneMockFlatTrim.RLock()
+	calls = mock.calls.FlatTrim
+	lockMamboDroneMockFlatTrim.RUnlock()
 	return calls
 }
 

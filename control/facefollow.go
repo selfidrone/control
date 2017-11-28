@@ -24,7 +24,7 @@ func (a *AutoPilot) StopFollowing() {
 
 // FollowFace moves to drone in the direction of a detected face
 func (a *AutoPilot) FollowFace(m *messages.FaceDetected) {
-	if a.lastFace != nil && a.following {
+	if a.lastFace != nil && a.following && a.lastFace != m {
 		a.moveDrone(m)
 	}
 
@@ -43,20 +43,12 @@ func (a *AutoPilot) moveDrone(m *messages.FaceDetected) {
 
 	if faceCenter < (centerPoint - a.minDistance) {
 		log.Println("Left")
-		if !a.movingLeft {
-			a.drone.Left(a.speed)
-			a.movingLeft = true
-		}
+		a.drone.Left(a.speed)
 	} else if (centerPoint + a.minDistance) < faceCenter {
 		log.Println("Right")
-		if !a.movingRight {
-			a.drone.Right(a.speed)
-			a.movingRight = true
-		}
+		a.drone.Right(a.speed)
 	} else {
 		log.Println("Stop")
-		a.movingLeft = false
-		a.movingRight = false
 		a.drone.Stop()
 	}
 
@@ -66,10 +58,8 @@ func (a *AutoPilot) moveDrone(m *messages.FaceDetected) {
 // setDeadMansSwitch sets a stop command after timeout incase no further face
 // tracking info is received
 func (a *AutoPilot) setDeadMansSwitch() {
-	log.Println("DMS Set")
 	if a.deadMansSwitch == nil {
-		log.Println("Start DMS", a.timeout)
-
+		log.Println("DMS Stop", a.timeout)
 		a.deadMansSwitch = time.AfterFunc(a.timeout, func() {
 			a.drone.Stop()
 		})
