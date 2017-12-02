@@ -25,7 +25,7 @@ func NewAutoPilot(d MamboDrone) *AutoPilot {
 		drone:       d,
 		following:   false,
 		minDistance: 50,
-		speed:       30,
+		speed:       20,
 		timeout:     1 * time.Second,
 	}
 }

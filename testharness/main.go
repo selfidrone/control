@@ -2,16 +2,17 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"image"
 	"log"
 	"time"
 
-	"github.com/nats-io/nats"
+	stan "github.com/nats-io/go-nats-streaming"
 	messages "github.com/nicholasjackson/drone-messages"
 )
 
 var natsServer = flag.String("nats", "nats://localhost:4222", "location of the nats.io server")
-var nc *nats.Conn
+var nc stan.Conn
 
 var bounds = image.Rect(0, 0, 800, 600)
 
@@ -29,14 +30,21 @@ var m = [][]image.Rectangle{
 	[]image.Rectangle{
 		image.Rect(250, 250, 300, 300), // Move Left CP: 275
 	},
-	/*
-		[]image.Rectangle{
-			image.Rect(350, 250, 400, 300), // Stop CP: 375
-		},
-		[]image.Rectangle{
-			image.Rect(350, 250, 400, 300), // Stop CP: 375
-		},
-	*/
+	[]image.Rectangle{
+		image.Rect(350, 250, 400, 300), // Stop CP: 375
+	},
+	[]image.Rectangle{
+		image.Rect(350, 250, 400, 300), // Stop CP: 375
+	},
+	[]image.Rectangle{
+		image.Rect(350, 250, 400, 300), // Stop CP: 375
+	},
+	[]image.Rectangle{
+		image.Rect(350, 250, 400, 300), // Stop CP: 375
+	},
+	[]image.Rectangle{
+		image.Rect(450, 250, 500, 300), // Right CP: 475
+	},
 	[]image.Rectangle{
 		image.Rect(450, 250, 500, 300), // Right CP: 475
 	},
@@ -56,9 +64,10 @@ func main() {
 	time.Sleep(5 * time.Second)
 
 	var err error
-	nc, err = nats.Connect(*natsServer)
+	clientID := fmt.Sprintf("server-%d", time.Now().UnixNano())
+	nc, err = stan.Connect("test-cluster", clientID, stan.NatsURL(*natsServer))
 	if err != nil {
-		log.Fatal("Unable to connect to nats server")
+		log.Fatal("Unable to connect to nats server: ", err)
 	}
 
 	for _, f := range m {

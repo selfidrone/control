@@ -8,6 +8,12 @@
   revision = "c88cfeb1882ae50943d93d5e1f810dfc3df7b5f1"
 
 [[projects]]
+  name = "github.com/gogo/protobuf"
+  packages = ["gogoproto","proto","protoc-gen-gogo/descriptor"]
+  revision = "342cbe0a04158f6dcb03ca0079991a51a4248c02"
+  version = "v0.5"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/freetype"
   packages = [".","raster","truetype"]
@@ -57,15 +63,15 @@
 
 [[projects]]
   name = "github.com/nats-io/go-nats"
-  packages = ["encoders/builtin","util"]
+  packages = [".","encoders/builtin","util"]
   revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
   version = "v1.3.0"
 
 [[projects]]
-  name = "github.com/nats-io/nats"
-  packages = ["."]
-  revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
-  version = "v1.3.0"
+  name = "github.com/nats-io/go-nats-streaming"
+  packages = [".","pb"]
+  revision = "6e620057a207bd61e992c1c5b6a2de7b6a4cb010"
+  version = "v0.3.4"
 
 [[projects]]
   name = "github.com/nats-io/nuid"
@@ -77,7 +83,7 @@
   branch = "master"
   name = "github.com/nicholasjackson/drone-messages"
   packages = ["."]
-  revision = "cc9f7170e030410c7068ec8eac343699b5d60ebd"
+  revision = "9c6474c2f4366ef6ec895b0758eb9f48affac42b"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -113,11 +119,11 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "a204229cd828a74741ee7b5da9bf4794497f85ed"
+  revision = "8b4580aae2a0dd0c231a45d3ccb8434ff533b840"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "72fc63541234fe154260a2ef33060c36c4950ed915f9ee3743977994a70c2964"
+  inputs-digest = "a5d99300ef5ce689c2d190df56e8c7edda5b44f5fb8adb3dd8755e1c1a324696"
   solver-name = "gps-cdcl"
   solver-version = 1

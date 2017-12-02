@@ -2,11 +2,10 @@ package messages
 
 import (
 	"bytes"
-	"compress/gzip"
-	"encoding/gob"
+	"encoding/base64"
+	"encoding/json"
 	"image"
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -16,7 +15,9 @@ const (
 	// MessageFaceDetection is the name of a message when a new face has been detected
 	MessageFaceDetection = "image.facedetection"
 	// MessageDroneImage is the name of a messeage when the drone takes a new image
-	MessageDroneImage = "image.new"
+	MessageDroneImage = "image.stream"
+	// MessageDronePicture is the name of a messeage when the drone takes a new image
+	MessageDronePicture = "image.picture"
 )
 
 const (
@@ -42,19 +43,19 @@ const (
 	CommandUp = "up"
 	// CommandStop instructs the drone to stop
 	CommandStop = "stop"
-
-	// CommandFollowFace instructs the drone to follow the location of a detected face
-	CommandFollowFace = "followface"
-
 	//CommandConnect instructs the application to connect to a drone
 	CommandConnect = "connect"
 	//CommandDisconnect instructs the application to connect to a drone
 	CommandDisconnect = "disconnect"
+	// CommandTakePicture isntructs the drone to take a picture
+	CommandTakePicture = "takepicture"
+	// CommandFollowFace instructs the drone to follow the location of a detected face
+	CommandFollowFace = "followface"
 )
 
 // DroneImage defines a new image taken from a drone
 type DroneImage struct {
-	Data []byte // Gzipped data
+	Data string // base64 encoded image
 }
 
 // Flight defines a flight instruction message
@@ -71,58 +72,47 @@ type FaceDetected struct {
 
 // EncodeMessage gob encodes the message and returns a byte slice
 func (bm *Flight) EncodeMessage() []byte {
-	var b bytes.Buffer
-	gob.NewEncoder(&b).Encode(bm)
+	data, err := json.Marshal(bm)
+	if err != nil {
+		return nil
+	}
 
-	return b.Bytes()
+	return data
 }
 
 // DecodeMessage decodes the messgage from gob byte slice
 func (bm *Flight) DecodeMessage(data []byte) {
-	gob.NewDecoder(bytes.NewBuffer(data)).Decode(bm)
+	json.Unmarshal(data, bm)
 }
 
 // EncodeMessage gob encodes the message and returns a byte slice
 func (bm *FaceDetected) EncodeMessage() []byte {
-	var b bytes.Buffer
-	gob.NewEncoder(&b).Encode(bm)
+	data, err := json.Marshal(bm)
+	if err != nil {
+		return nil
+	}
 
-	return b.Bytes()
+	return data
 }
 
 // DecodeMessage decodes the messgage from gob byte slice
 func (bm *FaceDetected) DecodeMessage(data []byte) {
-	gob.NewDecoder(bytes.NewBuffer(data)).Decode(bm)
+	json.Unmarshal(data, bm)
 }
 
 // EncodeMessage gob encodes the message and returns a byte slice
 func (bm *DroneImage) EncodeMessage() []byte {
-	var b bytes.Buffer
-	gob.NewEncoder(&b).Encode(bm)
+	data, err := json.Marshal(bm)
+	if err != nil {
+		return nil
+	}
 
-	return b.Bytes()
+	return data
 }
 
 // DecodeMessage decodes the messgage from gob byte slice
 func (bm *DroneImage) DecodeMessage(data []byte) {
-	gob.NewDecoder(bytes.NewBuffer(data)).Decode(bm)
-}
-
-// UnzippedData returns the message data in unzipped format
-func (bm *DroneImage) UnzippedData() []byte {
-	zr, _ := gzip.NewReader(bytes.NewBuffer(bm.Data))
-	d, _ := ioutil.ReadAll(zr)
-	return d
-}
-
-// SetZippedData gzips the given data and sets the Data field
-func (bm *DroneImage) SetZippedData(raw []byte) {
-	var zb bytes.Buffer
-	zw, _ := gzip.NewWriterLevel(&zb, gzip.BestCompression)
-	zw.Write(raw)
-	zw.Close()
-
-	bm.Data = zb.Bytes()
+	json.Unmarshal(data, bm)
 }
 
 // SaveDataToFile uncompresses the Data field and saves to a file
@@ -137,7 +127,10 @@ func (bm *DroneImage) SaveDataToFile(filename string) error {
 	}
 	defer f.Close()
 
-	d := bm.UnzippedData()
+	d, err := base64.StdEncoding.DecodeString(bm.Data)
+	if err != nil {
+		return err
+	}
 
 	io.Copy(f, bytes.NewBuffer(d))
 
