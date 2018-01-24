@@ -1,6 +1,7 @@
 package control
 
 import (
+	"log"
 	"testing"
 
 	"github.com/matryer/is"
@@ -20,30 +21,36 @@ func setupAutopilot(t *testing.T) (*AutoPilot, *MamboDroneMock, *CameraMock) {
 			return nil
 		},
 		DownFunc: func(val int) error {
+			log.Println("Drone Down")
 			return nil
 		},
 		ForwardFunc: func(val int) error {
+			log.Println("Drone Forward")
 			return nil
 		},
 		LandFunc: func() error {
 			return nil
 		},
 		LeftFunc: func(val int) error {
+			log.Println("Drone Left")
 			return nil
 		},
 		OnFunc: func(name string, f func(s interface{})) error {
 			return nil
 		},
 		RightFunc: func(val int) error {
+			log.Println("Drone Right")
 			return nil
 		},
 		TakeOffFunc: func() error {
 			return nil
 		},
 		UpFunc: func(val int) error {
+			log.Println("Drone Up")
 			return nil
 		},
 		StopFunc: func() error {
+			log.Println("Drone Stop")
 			return nil
 		},
 	}
@@ -59,6 +66,7 @@ func setupAutopilot(t *testing.T) (*AutoPilot, *MamboDroneMock, *CameraMock) {
 	}
 
 	ap := NewAutoPilot(mockedMamboDrone)
+	ap.minDistance = 50
 	ap.StartFollowing()
 
 	return ap, mockedMamboDrone, mockedCamera

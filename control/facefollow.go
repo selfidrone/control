@@ -46,6 +46,7 @@ func (a *AutoPilot) moveDrone(m *messages.FaceDetected) {
 
 	log.Println("Centre:", centerPointX, centerPointY)
 	log.Println("Face Center:", faceCenterX, faceCenterY)
+	log.Println("Min distance:", a.minDistance)
 
 	if faceCenterX < (centerPointX - a.minDistance) {
 		a.drone.Left(a.speed)

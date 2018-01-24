@@ -26,40 +26,38 @@ var bounds = image.Rect(0, 0, 800, 600)
 
 var faces = [][]image.Rectangle{
 	[]image.Rectangle{
-		image.Rect(325, 275, 350, 325), // Left
+		image.Rect(300, 275, 350, 325), // Left
 	},
 	[]image.Rectangle{
-		image.Rect(250, 250, 350, 350),
+		image.Rect(250, 250, 300, 325), // Left
 	},
 	[]image.Rectangle{
-		image.Rect(300, 250, 400, 350),
+		image.Rect(375, 275, 425, 325), // Stop
 	},
 	[]image.Rectangle{
-		image.Rect(350, 250, 450, 350),
+		image.Rect(450, 275, 500, 325), // Right
 	},
 	[]image.Rectangle{
-		image.Rect(350, 250, 450, 350),
+		image.Rect(500, 275, 550, 325), // Right
 	},
-	//		image.Rect(0, 0, 500, 400),
 }
 
 var verticalFaces = [][]image.Rectangle{
 	[]image.Rectangle{
-		image.Rect(375, 275, 425, 325),
+		image.Rect(375, 375, 425, 425), // Up
 	},
 	[]image.Rectangle{
-		image.Rect(375, 350, 425, 400),
+		image.Rect(375, 450, 425, 500), // Up
 	},
 	[]image.Rectangle{
-		image.Rect(375, 275, 425, 325),
+		image.Rect(375, 275, 425, 325), // Stop
 	},
 	[]image.Rectangle{
-		image.Rect(375, 275, 425, 325),
+		image.Rect(375, 225, 425, 275), // Down
 	},
 	[]image.Rectangle{
-		image.Rect(375, 275, 425, 325),
+		image.Rect(375, 175, 425, 225), // Down
 	},
-	//		image.Rect(0, 0, 500, 400),
 }
 
 func testNoMovement(is *is.I, md *MamboDroneMock) {
@@ -129,14 +127,55 @@ func TestDoesNotMovesDroneLeftWhenMinDistance(t *testing.T) {
 
 	ap.HandleMessage(&initialMessage)
 	ap.HandleMessage(&messages.FaceDetected{
-		Faces:  faces[4],
+		Faces:  faces[2],
 		Bounds: bounds,
 	})
 
 	is.Equal(1, len(md.StopCalls())) // expected 1 call to stop
 }
 
+func TestMovesDroneRight(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  faces[4],
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.RightCalls()))       // expected 1 call to move right
+	is.Equal(speed, md.RightCalls()[0].Val) // expected drone to move right at speed
+}
+
 func TestMovesDroneDown(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  verticalFaces[4],
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.DownCalls()))       // expected 1 call to move down
+	is.Equal(speed, md.DownCalls()[0].Val) // expected drone to move down at speed
+}
+
+func TestDoesNotMovesDroneDownWhenMinDistance(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  faces[2],
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.StopCalls())) // expected 1 call to stop
+}
+
+func TestMovesDroneUp(t *testing.T) {
 	ap, md, _ := setupAutopilot(t)
 	is := is.New(t)
 
@@ -146,43 +185,12 @@ func TestMovesDroneDown(t *testing.T) {
 		Bounds: bounds,
 	})
 
-	is.Equal(1, len(md.DownCalls()))       // expected 1 call to move down
-	is.Equal(speed, md.DownCalls()[0].Val) // expected drone to move down at speed
+	is.Equal(1, len(md.UpCalls()))       // expected 1 call to move up
+	is.Equal(speed, md.UpCalls()[0].Val) // expected drone to move up at speed
 }
 
 /*
-func TestMovesDroneRight(t *testing.T) {
-	ap, md, _ := setupAutopilot(t)
-	is := is.New(t)
-
-	ap.HandleMessage(initialMessage)
-	ap.HandleMessage(messages.FaceDetected{
-		Faces: []image.Rectangle{
-			image.Rect(0, 0, 200, 300),
-		},
-		Bounds: bounds,
-	})
-
-	is.Equal(1, len(md.RightCalls()))       // expected 1 call to move right
-	is.Equal(speed, md.RightCalls()[0].Val) // expected drone to move right at speed
-}
-
-func TestDoesNotMovesDroneRightWhenMinDistance(t *testing.T) {
-	ap, md, _ := setupAutopilot(t)
-	is := is.New(t)
-
-	ap.HandleMessage(initialMessage)
-	ap.HandleMessage(messages.FaceDetected{
-		Faces: []image.Rectangle{
-			image.Rect(0, 0, 299, 300),
-		},
-		Bounds: bounds,
-	})
-
-	is.Equal(1, len(md.RightCalls()))   // expected 1 call to move right
-	is.Equal(0, md.RightCalls()[0].Val) // expected to set speed to 0
-}
-*/
+ */
 
 func TestStopsDroneAfterNSecondsAndNoFaceData(t *testing.T) {
 	ap, md, _ := setupAutopilot(t)
