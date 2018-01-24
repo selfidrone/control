@@ -19,7 +19,7 @@ import (
 )
 
 var robot *gobot.Robot
-var drone *minidrone.Driver
+var drone control.MamboDrone
 var autoPilot *control.AutoPilot
 var nc stan.Conn
 var cam control.Camera
@@ -29,6 +29,7 @@ var exposure = flag.String("exposure", "auto", "exposure mode")
 var height = flag.Int("height", 600, "height")
 var width = flag.Int("width", 800, "width")
 var natsServer = flag.String("nats", "nats://localhost:4222", "location of the nats.io server")
+var simulate = flag.Bool("simulate", false, "Simulate sending commands to drone")
 var latestImage []byte
 var imageMutex sync.Mutex
 
@@ -85,23 +86,29 @@ func stopCamera() {
 }
 
 func startDrone(name string) {
-	bleAdaptor := ble.NewClientAdaptor(name)
-	drone = minidrone.NewDriver(bleAdaptor)
-
-	autoPilot = control.NewAutoPilot(drone)
-
 	work := func() {
 		autoPilot.Setup()
 		fmt.Println("Ready...")
 	}
 
-	robot = gobot.NewRobot("minidrone",
-		[]gobot.Connection{bleAdaptor},
-		[]gobot.Device{drone},
-		work,
-	)
+	if *simulate {
+		drone = &control.SimulatedDrone{}
+		autoPilot = control.NewAutoPilot(drone)
 
-	robot.Start()
+		work()
+	} else {
+		bleAdaptor := ble.NewClientAdaptor(name)
+		drone = minidrone.NewDriver(bleAdaptor)
+		autoPilot = control.NewAutoPilot(drone)
+
+		robot = gobot.NewRobot("minidrone",
+			[]gobot.Connection{bleAdaptor},
+			[]gobot.Device{drone.(*minidrone.Driver)},
+			work,
+		)
+		robot.Start()
+	}
+
 }
 
 func stopDrone() {

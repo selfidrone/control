@@ -9,11 +9,15 @@ import (
 	messages "github.com/nicholasjackson/drone-messages"
 )
 
-var speed = 30
+var speed = 20
 
+// minDistance = 50
+// bounds 800x600
+
+// center pos
 var initialMessage = messages.FaceDetected{
 	Faces: []image.Rectangle{
-		image.Rect(200, 250, 300, 350),
+		image.Rect(375, 275, 425, 325),
 	},
 	Bounds: bounds,
 }
@@ -22,7 +26,7 @@ var bounds = image.Rect(0, 0, 800, 600)
 
 var faces = [][]image.Rectangle{
 	[]image.Rectangle{
-		image.Rect(200, 250, 300, 350),
+		image.Rect(325, 275, 350, 325), // Left
 	},
 	[]image.Rectangle{
 		image.Rect(250, 250, 350, 350),
@@ -35,6 +39,25 @@ var faces = [][]image.Rectangle{
 	},
 	[]image.Rectangle{
 		image.Rect(350, 250, 450, 350),
+	},
+	//		image.Rect(0, 0, 500, 400),
+}
+
+var verticalFaces = [][]image.Rectangle{
+	[]image.Rectangle{
+		image.Rect(375, 275, 425, 325),
+	},
+	[]image.Rectangle{
+		image.Rect(375, 350, 425, 400),
+	},
+	[]image.Rectangle{
+		image.Rect(375, 275, 425, 325),
+	},
+	[]image.Rectangle{
+		image.Rect(375, 275, 425, 325),
+	},
+	[]image.Rectangle{
+		image.Rect(375, 275, 425, 325),
 	},
 	//		image.Rect(0, 0, 500, 400),
 }
@@ -111,6 +134,20 @@ func TestDoesNotMovesDroneLeftWhenMinDistance(t *testing.T) {
 	})
 
 	is.Equal(1, len(md.StopCalls())) // expected 1 call to stop
+}
+
+func TestMovesDroneDown(t *testing.T) {
+	ap, md, _ := setupAutopilot(t)
+	is := is.New(t)
+
+	ap.HandleMessage(&initialMessage)
+	ap.HandleMessage(&messages.FaceDetected{
+		Faces:  verticalFaces[0],
+		Bounds: bounds,
+	})
+
+	is.Equal(1, len(md.DownCalls()))       // expected 1 call to move down
+	is.Equal(speed, md.DownCalls()[0].Val) // expected drone to move down at speed
 }
 
 /*

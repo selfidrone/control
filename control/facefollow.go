@@ -7,7 +7,7 @@ import (
 	messages "github.com/nicholasjackson/drone-messages"
 )
 
-// StartFollowing allows the drone to start tracking a face and follow it
+// StartFollowing puts the drone into autonomous mode
 func (a *AutoPilot) StartFollowing() {
 	log.Println("Start Following")
 	a.following = true
@@ -24,7 +24,7 @@ func (a *AutoPilot) StopFollowing() {
 
 // FollowFace moves to drone in the direction of a detected face
 func (a *AutoPilot) FollowFace(m *messages.FaceDetected) {
-	if a.lastFace != nil && a.following && a.lastFace != m {
+	if a.lastFace != nil && a.following {
 		a.moveDrone(m)
 	}
 
@@ -32,23 +32,30 @@ func (a *AutoPilot) FollowFace(m *messages.FaceDetected) {
 }
 
 func (a *AutoPilot) moveDrone(m *messages.FaceDetected) {
+	if len(m.Faces) < 1 {
+		return
+	}
+
 	log.Println("Got Face, moving...", m)
 
 	// calculate the right moves
-	centerPoint := (m.Bounds.Max.X) / 2
-	faceCenter := ((m.Faces[0].Max.X - m.Faces[0].Min.X) / 2) + m.Faces[0].Min.X
+	centerPointX := (m.Bounds.Max.X) / 2
+	centerPointY := (m.Bounds.Max.Y) / 2
+	faceCenterX := ((m.Faces[0].Max.X - m.Faces[0].Min.X) / 2) + m.Faces[0].Min.X
+	faceCenterY := ((m.Faces[0].Max.Y - m.Faces[0].Min.Y) / 2) + m.Faces[0].Min.Y
 
-	log.Println("Centre:", centerPoint)
-	log.Println("Face Center:", faceCenter)
+	log.Println("Centre:", centerPointX, centerPointY)
+	log.Println("Face Center:", faceCenterX, faceCenterY)
 
-	if faceCenter < (centerPoint - a.minDistance) {
-		log.Println("Left")
+	if faceCenterX < (centerPointX - a.minDistance) {
 		a.drone.Left(a.speed)
-	} else if (centerPoint + a.minDistance) < faceCenter {
-		log.Println("Right")
+	} else if (centerPointX + a.minDistance) < faceCenterX {
 		a.drone.Right(a.speed)
+	} else if faceCenterY < (centerPointY - a.minDistance) {
+		a.drone.Down(a.speed)
+	} else if (centerPointY + a.minDistance) < faceCenterY {
+		a.drone.Up(a.speed)
 	} else {
-		log.Println("Stop")
 		a.drone.Stop()
 	}
 
@@ -59,16 +66,13 @@ func (a *AutoPilot) moveDrone(m *messages.FaceDetected) {
 // tracking info is received
 func (a *AutoPilot) setDeadMansSwitch() {
 	if a.deadMansSwitch == nil {
-		log.Println("DMS Stop", a.timeout)
 		a.deadMansSwitch = time.AfterFunc(a.timeout, func() {
+			log.Println("DMS Stop", a.timeout)
 			a.drone.Stop()
 		})
 
 		return
 	}
 
-	if !a.deadMansSwitch.Stop() {
-		<-a.deadMansSwitch.C
-	}
 	a.deadMansSwitch.Reset(a.timeout)
 }
