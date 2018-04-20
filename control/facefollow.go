@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	messages "github.com/nicholasjackson/drone-messages"
+	messages "github.com/selfidrone/messages"
 )
 
 // StartFollowing puts the drone into autonomous mode

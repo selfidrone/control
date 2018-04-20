@@ -1,10 +1,12 @@
 package control
 
 import (
+	"fmt"
 	"log"
+	"reflect"
 	"time"
 
-	messages "github.com/nicholasjackson/drone-messages"
+	messages "github.com/selfidrone/messages"
 	"gobot.io/x/gobot/platforms/parrot/minidrone"
 )
 
@@ -63,12 +65,15 @@ func (a *AutoPilot) Setup() error {
 
 // HandleMessage handles a message sent from the stream
 func (a *AutoPilot) HandleMessage(m interface{}) error {
+	log.Println("HandleMessage", "type", reflect.TypeOf(m), "msg", fmt.Sprintf("%#v", m))
+
 	switch m.(type) {
 	case *messages.Flight:
 		fm := m.(*messages.Flight)
 
 		switch fm.Command {
 		case messages.CommandTakeOff:
+			log.Println("HandleMessage", "takeoff", "msg", fmt.Sprintf("%#v", fm))
 			return a.drone.TakeOff()
 		case messages.CommandLand:
 			return a.drone.Land()
@@ -96,6 +101,8 @@ func (a *AutoPilot) HandleMessage(m interface{}) error {
 			a.drone.Up(0)
 			a.drone.Down(0)
 			return a.drone.Stop()
+		default:
+			log.Println("HandleMessage", "unknown flight message", "msg", fmt.Sprintf("%#v", fm))
 		case messages.CommandFollowFace:
 			if fm.Value == 1 {
 				a.StartFollowing()
@@ -105,6 +112,8 @@ func (a *AutoPilot) HandleMessage(m interface{}) error {
 		}
 	case *messages.FaceDetected:
 		a.FollowFace(m.(*messages.FaceDetected))
+	default:
+		log.Println("HandleMessage", "unknown type message", "msg", fmt.Sprintf("%#v", m))
 	}
 
 	return nil
