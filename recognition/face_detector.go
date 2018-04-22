@@ -33,10 +33,7 @@ func NewFaceProcessor() *FaceProcessor {
 }
 
 // DetectFaces detects faces in the image and returns an array of rectangle
-func (fp *FaceProcessor) DetectFaces(file string) (faces []image.Rectangle, bounds image.Rectangle) {
-	img := gocv.IMRead(file, gocv.IMReadColor)
-	defer img.Close()
-
+func (fp *FaceProcessor) DetectFaces(img gocv.Mat) (faces []image.Rectangle, bounds image.Rectangle) {
 	bds := image.Rectangle{Min: image.Point{}, Max: image.Point{X: img.Cols(), Y: img.Rows()}}
 	//gocv.CvtColor(img, img, gocv.ColorRGBToGray)
 	//	gocv.Resize(img, img, image.Point{}, 0.6, 0.6, gocv.InterpolationArea)

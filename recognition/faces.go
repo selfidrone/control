@@ -11,6 +11,8 @@ import (
 type Faces struct{}
 
 func (f *Faces) Start(deviceID int) {
+	processor := NewFaceProcessor()
+
 	// open webcam
 	webcam, err := gocv.VideoCaptureDevice(int(deviceID))
 	if err != nil {
@@ -34,6 +36,8 @@ func (f *Faces) Start(deviceID int) {
 		}
 
 		fmt.Println("Got image")
+		f, b := processor.DetectFaces(img)
+		fmt.Printf("faces: %#v, bounds: %#v", f, b)
 
 		time.Sleep(100 * time.Millisecond)
 	}
