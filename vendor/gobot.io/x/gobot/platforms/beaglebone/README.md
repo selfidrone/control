@@ -2,14 +2,18 @@
 
 The BeagleBone is an ARM based single board computer, with lots of GPIO, I2C, and analog interfaces built in.
 
-The Gobot adaptor for the BeagleBone should support all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and standard "Cape Manager" interfaces.
+The Gobot adaptor for the BeagleBone supports all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and standard "Cape Manager" interfaces.
 
 For more info about the BeagleBone platform go to  [http://beagleboard.org/getting-started](http://beagleboard.org/getting-started).
+
+In addition, there is an separate Adaptor for the PocketBeagle, a USB-key-fob sized computer. The PocketBeagle has a different pin layout and somewhat different capabilities.
+
+For more info about the PocketBeagle platform go to  [http://beagleboard.org/pocket](http://beagleboard.org/pocket).
 
 
 ## How to Install
 
-We recommend updating to the latest Debian Jessie OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
+We recommend updating to the latest Debian OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
 
@@ -54,6 +58,39 @@ func main() {
 }
 ```
 
+To use the PocketBeagle, use `beaglebone.NewPocketBeagleAdaptor()` like this:
+
+```go
+package main
+
+import (
+	"time"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/beaglebone"
+)
+
+func main() {
+	beagleboneAdaptor := beaglebone.NewPocketBeagleAdaptor()
+	led := gpio.NewLedDriver(beagleboneAdaptor, "P1_02")
+
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
+
+	robot := gobot.NewRobot("pocketBeagleBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	robot.Start()
+}
+```
+
 ## How to Connect
 
 ### Compiling
@@ -67,15 +104,17 @@ $ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 Once you have compiled your code, you can you can upload your program and execute it on the BeagleBone from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
-$ scp beaglebone_blink root@192.168.7.2:/home/root/
-$ ssh -t root@192.168.7.2 "./beaglebone_blink"
+$ scp beaglebone_blink debian@192.168.7.2:/home/debian/
+$ ssh -t debian@192.168.7.2 "./beaglebone_blink"
 ```
 
 In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi.
 
+You must also configure hardware settings as described below.
+
 ### Updating your board to the latest OS
 
-We recommend updating your BeagleBone to the latest Debian OS. It is very easy to do this using the Etcher (https://etcher.io/) utility program.
+We recommend using your BeagleBone with the latest Debian OS. It is very easy to do this using the Etcher (https://etcher.io/) utility program.
 
 First, download the latest BeagleBone OS from http://beagleboard.org/latest-images
 
@@ -92,3 +131,19 @@ Once you have created the SD card, boot your BeagleBone using the new image as f
 These instructions come from the Beagleboard web site's "Getting Started" page located here:
 
 http://beagleboard.org/getting-started
+
+### Configure hardware settings
+
+Thanks to the BeagleBone team, the new "U-Boot Overlays" system for enabling hardware and the "cape-universal", the latest Debian OS should "just work" with any GPIO, PWM, I2C, or SPI pins.
+
+If you want to dig in and learn more about this check out:
+
+https://elinux.org/Beagleboard:BeagleBoneBlack_Debian#U-Boot_Overlays
+
+### Upgrading from an older version
+
+Please note that if you are upgrading a board that has already run from an older version of Debian OS, you might need to clear out your older eMMC bootloader, otherwise the new U-Boot Overlays in the newer U-Boot may not get enabled. If so, login using SSH and run the following command on your BeagleBone board:
+
+	sudo dd if=/dev/zero of=/dev/mmcblk1 count=1 seek=1 bs=128k
+
+Thanks to [@RobertCNelson](https://github.com/RobertCNelson) for the tip on the above.

@@ -5,13 +5,13 @@
   branch = "master"
   name = "github.com/go-ble/ble"
   packages = [".","darwin","linux","linux/adv","linux/att","linux/gatt","linux/hci","linux/hci/cmd","linux/hci/evt","linux/hci/socket"]
-  revision = "c88cfeb1882ae50943d93d5e1f810dfc3df7b5f1"
+  revision = "721d2405efb7924028deef3b0105219209fba482"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
   packages = ["gogoproto","proto","protoc-gen-gogo/descriptor"]
-  revision = "342cbe0a04158f6dcb03ca0079991a51a4248c02"
-  version = "v0.5"
+  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -27,15 +27,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/hashicorp/go-hclog"
+  packages = ["."]
+  revision = "69ff559dc25f3b435631604f573a5fa1efdb6433"
+
+[[projects]]
+  branch = "master"
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
-  revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
 
 [[projects]]
   branch = "master"
   name = "github.com/matryer/is"
   packages = ["."]
-  revision = "c0323ceb4e996e4a8795670d1fb6f60e65b82fd2"
+  revision = "ddfea1427ac856b36d12518423447a1aedbb07ee"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -64,8 +70,8 @@
 [[projects]]
   name = "github.com/nats-io/go-nats"
   packages = [".","encoders/builtin","util"]
-  revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
-  version = "v1.3.0"
+  revision = "062418ea1c2181f52dc0f954f6204370519a868b"
+  version = "v1.5.0"
 
 [[projects]]
   name = "github.com/nats-io/go-nats-streaming"
@@ -83,7 +89,7 @@
   branch = "master"
   name = "github.com/nicholasjackson/drone-messages"
   packages = ["."]
-  revision = "9c6474c2f4366ef6ec895b0758eb9f48affac42b"
+  revision = "9a3f1797989b5e5ba64c566122fbe01ae63d6080"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -95,7 +101,13 @@
   branch = "master"
   name = "github.com/raff/goble"
   packages = ["xpc"]
-  revision = "591010bb87c136ee390f8f20529039fea824f737"
+  revision = "efeac611681b89806d673dfbd8fc1690ca6bd093"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/selfidrone/messages"
+  packages = ["."]
+  revision = "9a3f1797989b5e5ba64c566122fbe01ae63d6080"
 
 [[projects]]
   branch = "master"
@@ -106,24 +118,30 @@
 [[projects]]
   name = "gobot.io/x/gobot"
   packages = [".","platforms/ble","platforms/parrot/minidrone"]
-  revision = "9f153dbce4d06717185a5c864a350c216a94ae76"
-  version = "v1.7.1"
+  revision = "73069e4345b0cd5799189ed74a2126a97d4febdf"
+  version = "1.10.0"
+
+[[projects]]
+  name = "gocv.io/x/gocv"
+  packages = ["."]
+  revision = "ab6d932219faf43e531eea89ef3496cdb67aa734"
+  version = "0.11.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/image"
   packages = ["font","font/gofont/goregular","math/fixed"]
-  revision = "f7e31b4ea2e3413ab91b4e7d2dc83e5f8d19a44c"
+  revision = "f315e440302883054d0c2bd85486878cb4f8572c"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "8b4580aae2a0dd0c231a45d3ccb8434ff533b840"
+  revision = "79b0c6888797020a994db17c8510466c72fe75d9"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a5d99300ef5ce689c2d190df56e8c7edda5b44f5fb8adb3dd8755e1c1a324696"
+  inputs-digest = "5ec3a99cbfdd267eb512a391e10f8ba8d11f32fd937b5a3b686708044e1ff908"
   solver-name = "gps-cdcl"
   solver-version = 1

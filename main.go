@@ -12,6 +12,7 @@ import (
 	hclog "github.com/hashicorp/go-hclog"
 	stan "github.com/nats-io/go-nats-streaming"
 	"github.com/selfidrone/control/control"
+	"github.com/selfidrone/control/recognition"
 	messages "github.com/selfidrone/messages"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/ble"
@@ -34,6 +35,7 @@ var (
 	natsServer = flag.String("nats", "nats://localhost:4222", "location of the nats.io server")
 	simulate   = flag.Bool("simulate", false, "Simulate sending commands to drone")
 	logLevel   = flag.String("log_level", "INFO", "log level should be set to a vault INFO, WARN, DEBUG, TRACE")
+	camera     = flag.Int("camera", 0, "device id for the camera to use")
 )
 
 var latestImage []byte
@@ -47,8 +49,9 @@ func main() {
 	log = hclog.New(&hclog.LoggerOptions{Level: hclog.LevelFromString(*logLevel)})
 	log.Info("Starting drone control", "log_level", *logLevel)
 
-	setupNATS()
-	go initDroneCamera()
+	//setupNATS()
+	//go initDroneCamera()
+	startGoCV()
 
 	handleExit()
 }
@@ -57,6 +60,11 @@ func handleExit() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
+}
+
+func startGoCV() {
+	faces := recognition.Faces{}
+	faces.Start(*camera)
 }
 
 func initDroneCamera() {

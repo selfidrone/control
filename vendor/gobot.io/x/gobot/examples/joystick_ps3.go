@@ -13,9 +13,7 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor,
-		"./platforms/joystick/configs/dualshock3.json",
-	)
+	stick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
 	work := func() {
 		// buttons
@@ -54,6 +52,18 @@ func main() {
 		})
 		stick.On(joystick.SelectRelease, func(data interface{}) {
 			fmt.Println("select_release")
+		})
+		stick.On(joystick.RightPress, func(data interface{}) {
+			fmt.Println("right_press")
+		})
+		stick.On(joystick.LeftPress, func(data interface{}) {
+			fmt.Println("left_press")
+		})
+		stick.On(joystick.UpPress, func(data interface{}) {
+			fmt.Println("up_press")
+		})
+		stick.On(joystick.DownPress, func(data interface{}) {
+			fmt.Println("down_press")
 		})
 
 		// joysticks

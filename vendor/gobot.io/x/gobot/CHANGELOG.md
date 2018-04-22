@@ -1,3 +1,91 @@
+1.10.0
+---
+* **docs**
+    * add gitter badge to readme
+* **gpio**
+    * AIP1640 led driver, used in Wemos D1 mini's matrix LED shield
+* **spi**
+    * switch to using periph.io for SPI interfaces
+    * add support for ssd1306 
+    * add optional params such as bus/chip to all current drivers
+    * complete refactoring to spi.Connection
+    * remove unneeded code as suggested by @maruel
+    * remove unneeded type and cleanup GoDocs
+* **ble**
+    * correct spelling error in function name
+* **build**
+    * update to latest version of Go 1.10 for Travis build
+* **cli**
+    * remove extra newline
+* **docs**
+    * add recently contributed GPIO devices to README
+* **joystick**
+    * able to configure joysticks without external json file
+    * correct error in scanning script
+    * correct events used by gamepad-style up/down/left/right buttons
+    * correct scanner error from ID
+    * removed double release event
+* **tello**
+    * add support for DJI Tello drone
+
+1.9.0
+---
+* **beaglebone**
+  * update pin naming, docs, and examples for the latest Debian OS releases
+* **opencv**
+  * update build settings needed to build OpenCV/GoCV as part of test suite
+  * deps for latest GoCV v0.9.0
+* **build**
+  * update Travis build to use very latest Go versions
+* **docs**
+  * add references to new drivers for ADXL345, BH1750, and TM1638.
+  * improve docs for installation and use of OpenCV/GoCV from Gobot
+  * update copyright date to 2018
+* **gpio**
+  * Initial support for TM1638 modules
+* **i2c**
+  * Added basic driver for BH1750 (light sensor), board GY-302
+  * support for accel ADXL345
+* **bb8/ollie/sprkplus**
+  * add Boost command
+  * add Set Back LED Output command
+  * add Set Raw Motor Values command
+  * add Set Rotation Rate command
+  * add Set Stabilization command
+* **test** 
+  * Refactor TestAdaptorDigitalPinConcurrency test
+
+1.8.0
+---
+* **sysfs** 
+  * pause briefly to allow udev rules to apply when exporting PWMPin
+* **beaglebone** 
+  * correct uboot installation instructions
+  * add SPI support
+  * no more slots, add docs on configuring u-boot overlays
+  * handle gpio pinmux without relying on specific pre-existing setup
+* **pocketbeagle** 
+  * add support for PocketBeagle
+  * use universal io cape manager to initialize board setup
+  * improve docs for latest Debian OS
+* **build** 
+  * Add dep, change how tests run in CI
+  * update dependencies to latest GoCV version
+* **spi** 
+  * Add MCP3002, MCP3202, MCP3204, MCP3208, MCP3304, MCP3004, and MCP3008 A/D converter drivers
+  * adding initial support for APA102 LEDs, thanks to code sample from @rakyll
+  * extract shared SPI init code into spi package
+* **up2** 
+  * initial work on support for UP2 board
+* **gopigo3**
+  * fixed set/get bug with motor dps
+* **gpio**
+  * Adding stepper motor module
+* **firmata** 
+  * handle cases where out of sync data is read from serial port on first connecting
+* **i2c**
+  * Change init payload sequence within jhd1313m1 driver Start() func.
+
 1.7.1
 ---
 * **sprkplus**

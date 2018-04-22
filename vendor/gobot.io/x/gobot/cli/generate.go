@@ -31,7 +31,7 @@ func Generate() cli.Command {
 				}
 			}
 			if valid == false {
-				fmt.Println("Invalid/no subcommand supplied.\n")
+				fmt.Println("Invalid/no subcommand supplied.")
 				fmt.Println("Usage:")
 				fmt.Println(" gobot generate adaptor <name> [package] # generate a new Gobot adaptor")
 				fmt.Println(" gobot generate driver  <name> [package] # generate a new Gobot driver")
@@ -412,6 +412,6 @@ Explain how to connect to the device here...
 
 ## License
 
-Copyright (c) 2017 <Your Name Here>. Licensed under the <Insert license here> license.
+Copyright (c) 2018 <Your Name Here>. Licensed under the <Insert license here> license.
 `
 }
