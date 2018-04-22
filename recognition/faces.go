@@ -2,6 +2,7 @@ package recognition
 
 import (
 	"fmt"
+	"time"
 
 	"gocv.io/x/gocv"
 )
@@ -17,9 +18,6 @@ func (f *Faces) Start(deviceID int) {
 		return
 	}
 	defer webcam.Close()
-	// open display window
-	window := gocv.NewWindow("Face Detect")
-	defer window.Close()
 
 	// prepare image matrix
 	img := gocv.NewMat()
@@ -35,11 +33,9 @@ func (f *Faces) Start(deviceID int) {
 			continue
 		}
 
-		window.IMShow(img)
-		if window.WaitKey(1) >= 0 {
-			break
-		}
+		fmt.Println("Got image")
 
+		time.Sleep(100 * time.Millisecond)
 	}
 
 }
