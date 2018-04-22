@@ -49,9 +49,9 @@ func main() {
 	log = hclog.New(&hclog.LoggerOptions{Level: hclog.LevelFromString(*logLevel)})
 	log.Info("Starting drone control", "log_level", *logLevel)
 
-	//setupNATS()
+	setupNATS()
 	//go initDroneCamera()
-	startGoCV()
+	go startGoCV()
 
 	handleExit()
 }
